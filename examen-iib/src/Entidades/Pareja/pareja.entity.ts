@@ -29,7 +29,7 @@ export class ParejaEntity{
         nullable: false,
         name: 'pareja_son_casados',        
     })
-    sonCasados: string;
+    sonCasados: boolean;
 
     @Column({
         type: 'float',
