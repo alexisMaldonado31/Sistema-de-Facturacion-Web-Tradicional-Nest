@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsString, Min, MinLength, IsBoolean } from 'class-validator';
 
-export class ParejaCreateDto{
+export class ParejaUpdateDto{
 
   @IsNotEmpty()
   @IsString()
@@ -17,4 +17,9 @@ export class ParejaCreateDto{
   @IsNotEmpty()
   @IsNumber()
   precio: number
+
+  @IsNotEmpty()
+  @IsNumber()
+  @Min(0)
+  id:number;
 }
