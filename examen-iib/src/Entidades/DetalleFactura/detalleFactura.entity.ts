@@ -14,9 +14,16 @@ export class DetalleFacturaEntity{
         type: 'int',
         nullable: false,
         name: 'cantidad',
-        unique: true
     })
-    cantidad: string;
+    cantidad: number;
+
+    @Column({
+        type: 'decimal',
+        precision: 10,
+        scale:2,
+        name: 'precio',
+    })
+    precio: number;
 
     @Column({
         type: 'decimal',
