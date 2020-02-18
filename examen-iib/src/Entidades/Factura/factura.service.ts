@@ -12,7 +12,11 @@ export class FacturaService {
     }
 
     buscarUnaFactura(id: number): Promise<FacturaEntity | undefined> {
-        return this._repositorioFactura.findOne(id);
+        return this._repositorioFactura.findOne(id,
+            {
+                relations: ["detalles", "detalles.pareja"]
+            }
+        );
     }
 
     crearFactura(factura: FacturaEntity) {
