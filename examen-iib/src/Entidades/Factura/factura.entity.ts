@@ -26,7 +26,7 @@ export class FacturaEntity{
         nullable: false,
         name: 'factura_total'        
     })
-    total: string;
+    total: number;
 
     @Column({
         type: 'varchar',
