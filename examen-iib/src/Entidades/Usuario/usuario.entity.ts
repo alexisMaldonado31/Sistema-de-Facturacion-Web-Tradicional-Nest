@@ -26,6 +26,13 @@ export class UsuarioEntity{
     })
     password: string;
 
+    @Column({
+        type: 'varchar',
+        nullable: false,
+        name: 'rol'
+    })
+    rol: string;
+
     @OneToMany(
         type => FacturaEntity,
         detalleFactura => detalleFactura.usuario
