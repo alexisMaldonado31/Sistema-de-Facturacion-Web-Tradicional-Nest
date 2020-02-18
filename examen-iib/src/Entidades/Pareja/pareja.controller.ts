@@ -6,7 +6,7 @@ import { ParejaCreateDto } from './pareja.create-dto';
 import { ParejaUpdateDto } from './pareja.update-dto';
 
 @Controller('pareja')
-export class ParejaController{
+export class ParejaController {
   constructor(
     private readonly _parejaService: ParejaService
   ) {
@@ -15,23 +15,30 @@ export class ParejaController{
   @Post()
   async ingresarPareja(
     @Body() pareja: ParejaEntity,
-    @Res() res
-  ):Promise<void>{
-    const parejaCreateDto = new ParejaCreateDto();
-    parejaCreateDto.nombre = pareja.nombre;
-    parejaCreateDto.anios = pareja.anios;
-    parejaCreateDto.sonCasados = pareja.sonCasados;
-    parejaCreateDto.precio = pareja.precio;
+    @Res() res,
+    @Session() session
+  ): Promise<void> {
+    if (session) {
+      if (session.usuario.roles.includes('Administrador')) {
+        const parejaCreateDto = new ParejaCreateDto();
+        parejaCreateDto.nombre = pareja.nombre;
+        parejaCreateDto.anios = pareja.anios;
+        parejaCreateDto.sonCasados = pareja.sonCasados;
+        parejaCreateDto.precio = pareja.precio;
 
-    const errores = await validate(parejaCreateDto);
-    if(errores.length > 0){
-      throw new BadRequestException(errores);
-    }else{
-      try {
-        await this._parejaService.crearPareja(pareja);
-        res.send('OK');
-      }catch (e) {
-        throw new BadRequestException('No se puede ingresar el parque');
+        const errores = await validate(parejaCreateDto);
+        if (errores.length > 0) {
+          throw new BadRequestException(errores);
+        } else {
+          try {
+            await this._parejaService.crearPareja(pareja);
+            res.send('OK');
+          } catch (e) {
+            throw new BadRequestException('No se puede ingresar el parque');
+          }
+        }
+      } else {
+        res.send("No cuenta con permisos de Administrador");
       }
     }
   }
@@ -39,7 +46,7 @@ export class ParejaController{
   @Get(':id')
   buscarUnaPareja(
     @Param('id') id: string,
-    ):Promise<ParejaEntity | undefined>{
+  ): Promise<ParejaEntity | undefined> {
     return this._parejaService.buscarUnaPareja(Number(id));
   }
 
@@ -49,19 +56,19 @@ export class ParejaController{
     @Query('take') take?: string | number,
     @Query('where') where?: string,
     @Query('order') order?: string
-  ):Promise<ParejaEntity[] | undefined>{
-    if(order){
+  ): Promise<ParejaEntity[] | undefined> {
+    if (order) {
       try {
         order = JSON.parse(order);
-      }catch (e) {
+      } catch (e) {
         order = undefined;
       }
     }
 
-    if(where){
+    if (where) {
       try {
         where = JSON.parse(where);
-      }catch (e) {
+      } catch (e) {
         where = undefined;
       }
     }
@@ -78,32 +85,48 @@ export class ParejaController{
     @Body() pareja: ParejaEntity,
     @Param('id') id: string,
     @Res() res,
-  ):Promise<void>{
-    const parejaUpdateDto = new ParejaUpdateDto();
-    parejaUpdateDto.nombre = pareja.nombre;
-    parejaUpdateDto.anios = pareja.anios;
-    parejaUpdateDto.sonCasados = pareja.sonCasados;
-    parejaUpdateDto.precio = pareja.precio;
-    parejaUpdateDto.id = +id;
-    const errores = await validate(parejaUpdateDto);
-    if(errores.length > 0){
-      throw new BadRequestException();
-    }else{
-      await this._parejaService.actualizarParejas(+id, pareja);
-      res.send('Ok')
+    @Session() session
+  ): Promise<void> {
+    if (session) {
+      if (session.usuario.roles.includes('Administrador')) {
+        const parejaUpdateDto = new ParejaUpdateDto();
+        parejaUpdateDto.nombre = pareja.nombre;
+        parejaUpdateDto.anios = pareja.anios;
+        parejaUpdateDto.sonCasados = pareja.sonCasados;
+        parejaUpdateDto.precio = pareja.precio;
+        parejaUpdateDto.id = +id;
+        const errores = await validate(parejaUpdateDto);
+        if (errores.length > 0) {
+          throw new BadRequestException();
+        } else {
+          await this._parejaService.actualizarParejas(+id, pareja);
+          res.send('Ok')
+        }
+      } else {
+        res.send("No cuenta con permisos de Administrador");
+      }
     }
+
   }
 
   @Post(':id')
   async eliminarPareja(
     @Param('id') id: string,
-    @Res() res
-  ): Promise<void>{
-    try {
-      await this._parejaService.borrarPareja(+id);
-      res.send('Ok');
-    }catch (error) {
-      throw new BadRequestException();
+    @Res() res,
+    @Session() session
+  ): Promise<void> {
+    if (session) {
+      if (session.usuario.roles.includes('Administrador')) {
+        try {
+          await this._parejaService.borrarPareja(+id);
+          res.send('Ok');
+        } catch (error) {
+          throw new BadRequestException();
+        }
+      } else {
+        res.send("No cuenta con permisos de Administrador");
+      }
     }
+
   }
 }
