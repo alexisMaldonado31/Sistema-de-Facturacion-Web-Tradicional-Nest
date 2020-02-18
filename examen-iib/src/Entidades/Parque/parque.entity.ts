@@ -49,7 +49,8 @@ export class ParqueEntity{
     @Column({
         type: 'varchar',
         nullable: false,
-        name: 'parque_codigo_postal'
+        name: 'parque_codigo_postal',
+        unique: true
     })
     codigoPostal: string;
 
@@ -66,15 +67,13 @@ export class ParqueEntity{
         type: 'varchar',
         nullable: false,
         name: 'parque_tipo',
-        unique: true
     })
     tipo: string;
 
     @Column({
-        type: 'bit',
+        type: 'boolean',
         nullable: false,
         name: 'parque_es_destino_turistico',
-        unique: true
     })
     esDestinoTuristico: boolean;
 

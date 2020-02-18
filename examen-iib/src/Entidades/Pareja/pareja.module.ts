@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ParejaEntity } from "./pareja.entity";
 import { ParejaService } from "./pareja.service";
+import { ParejaController } from "./pareja.controller";
 
 @Module({
     imports: [
@@ -12,7 +13,7 @@ import { ParejaService } from "./pareja.service";
         )
     ],
     controllers: [
-
+        ParejaController
     ],
     providers: [
         ParejaService

@@ -3,8 +3,9 @@ import { validate } from 'class-validator';
 import { ParqueService } from './parque.service';
 import { ParqueEntity } from './parque.entity';
 import { ParqueCreateDto } from './parque.create-dto';
+import { ParqueUpdateDto } from './parque.update-dto';
 
-@Controller('pokemon')
+@Controller('parque')
 export class ParqueController{
   constructor(
     private readonly _parqueService: ParqueService
@@ -40,14 +41,14 @@ export class ParqueController{
   }
 
   @Get(':id')
-  buscarUnPokemon(
+  buscarUnParque(
     @Param('id') id: string,
     ):Promise<ParqueEntity | undefined>{
     return this._parqueService.buscarUnParque(Number(id));
   }
 
   @Get()
-  buscarPokemons(
+  buscarParques(
     @Query('skip') skip?: string | number,
     @Query('take') take?: string | number,
     @Query('where') where?: string,
@@ -74,6 +75,32 @@ export class ParqueController{
       take as number,
       order
     );
+  }
+
+  @Post(':id')
+  async actualizarParque(
+    @Body() parque: ParqueEntity,
+    @Param('id') id: string,
+    @Res() res,
+  ):Promise<void>{
+    const parqueUpdateDto = new ParqueUpdateDto();
+    parqueUpdateDto.nombre = parque.nombre;
+    parqueUpdateDto.area = parque.area;
+    parqueUpdateDto.ciudad = parque.ciudad;
+    parqueUpdateDto.codigoPostal = parque.codigoPostal;
+    parqueUpdateDto.descripcion = parque.descripcion;
+    parqueUpdateDto.direccion = parque.direccion;
+    parqueUpdateDto.esDestinoTuristico = parque.esDestinoTuristico;
+    parqueUpdateDto.id = +id;
+    parqueUpdateDto.parqueTipo = parque.tipo;
+    parqueUpdateDto.sector = parque.sector;
+    const errores = await validate(parqueUpdateDto);
+    if(errores.length > 0){
+      throw new BadRequestException();
+    }else{
+      await this._parqueService.actualizarParque(+id, parque);
+      res.send('Ok')
+    }
   }
 
   @Post(':id')

@@ -25,7 +25,7 @@ export class ParejaEntity{
     anios: number;
 
     @Column({
-        type: 'bit',
+        type: 'boolean',
         nullable: false,
         name: 'pareja_son_casados',        
     })

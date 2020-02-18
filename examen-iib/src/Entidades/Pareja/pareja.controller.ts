@@ -3,6 +3,7 @@ import { validate } from 'class-validator';
 import { ParejaService } from './pareja.service';
 import { ParejaEntity } from './pareja.entity';
 import { ParejaCreateDto } from './pareja.create-dto';
+import { ParejaUpdateDto } from './pareja.update-dto';
 
 @Controller('pareja')
 export class ParejaController{
@@ -36,14 +37,14 @@ export class ParejaController{
   }
 
   @Get(':id')
-  buscarUnPokemon(
+  buscarUnaPareja(
     @Param('id') id: string,
     ):Promise<ParejaEntity | undefined>{
     return this._parejaService.buscarUnaPareja(Number(id));
   }
 
   @Get()
-  buscarPokemons(
+  buscarParejas(
     @Query('skip') skip?: string | number,
     @Query('take') take?: string | number,
     @Query('where') where?: string,
@@ -73,7 +74,28 @@ export class ParejaController{
   }
 
   @Post(':id')
-  async eliminarParque(
+  async actualizarPareja(
+    @Body() pareja: ParejaEntity,
+    @Param('id') id: string,
+    @Res() res,
+  ):Promise<void>{
+    const parejaUpdateDto = new ParejaUpdateDto();
+    parejaUpdateDto.nombre = pareja.nombre;
+    parejaUpdateDto.anios = pareja.anios;
+    parejaUpdateDto.sonCasados = pareja.sonCasados;
+    parejaUpdateDto.precio = pareja.precio;
+    parejaUpdateDto.id = +id;
+    const errores = await validate(parejaUpdateDto);
+    if(errores.length > 0){
+      throw new BadRequestException();
+    }else{
+      await this._parejaService.actualizarParejas(+id, pareja);
+      res.send('Ok')
+    }
+  }
+
+  @Post(':id')
+  async eliminarPareja(
     @Param('id') id: string,
     @Res() res
   ): Promise<void>{

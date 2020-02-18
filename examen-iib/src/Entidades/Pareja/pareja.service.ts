@@ -11,7 +11,9 @@ export class ParejaService{
     ){}
 
     buscarUnaPareja(id: number): Promise<ParejaEntity | undefined>{
-        return this._repositorioPareja.findOne(id);
+        return this._repositorioPareja.findOne(id, {
+            relations: ["parque"]
+        });
     }
 
     crearPareja(pareja: ParejaEntity){
@@ -40,7 +42,8 @@ export class ParejaService{
         where: where,
         skip: skip,
         take: take,
-        order: order
+        order: order,
+        relations: ["parque"]
         }
     );
     }
