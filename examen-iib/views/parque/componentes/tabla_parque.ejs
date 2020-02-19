@@ -1,0 +1,65 @@
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Nombre</th>
+        <th scope="col">Area</th>
+        <th scope="col">Ciudad</th>
+        <th scope="col">Codigo Postal</th>
+        <th scope="col">Descripcion</th>
+        <th scope="col">Direccion</th>
+        <th scope="col">Sector</th>
+        <th scope="col">Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%parques.forEach( parque => {%>
+        <tr>
+            <th scope="row">   
+                <%= parque.id  %>              
+            </th>
+            <td>
+                <%= parque.nombre%>
+            </td>
+            <td>
+                <%= parque.area%>
+            </td>
+            <td>
+                <%= parque.ciudad%>
+            </td>
+            <td>
+                <%= parque.codigoPostal%>
+            </td>
+            <td>
+                <%= parque.descripcion%>
+            </td>
+            <td>
+                <%= parque.direccion%>
+            </td>
+            <td>
+                <%= parque.sector%>
+            </td>
+            <td>
+
+                <a href="/parque/ruta/editar-usuario/<%= parque.id%>">
+                    <button type="button"
+                            class="btn btn-info">
+                        Editar
+                    </button>
+                </a>
+                <form action="/parque/<%= parque.id%>"
+                      method="POST"
+                >
+                    <button type="submit"
+                            class="btn btn-danger">
+                        Eliminar
+                    </button>
+                </form>
+
+            </td>
+        </tr>
+    <%})%>
+
+
+    </tbody>
+</table>

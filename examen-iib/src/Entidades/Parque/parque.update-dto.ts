@@ -32,14 +32,6 @@ export class ParqueUpdateDto{
   area: number
 
   @IsNotEmpty()
-  @IsString()
-  parqueTipo: string
-
-  @IsNotEmpty()
-  @IsBoolean()
-  esDestinoTuristico: boolean
-
-  @IsNotEmpty()
   @IsNumber()
   @Min(0)
   id:number;

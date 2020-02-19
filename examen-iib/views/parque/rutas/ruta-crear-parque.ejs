@@ -1,0 +1,108 @@
+<%- include('../../compartido/cabecera')%>
+<% const estaEditando = false;%>
+<% console.log(datos.tipoMensaje) %> 
+
+<div class="container">
+    <%if(datos.tipoMensaje != 0){%>
+    <div class="alert alert-<%= datos.tipoMensaje == 1 ? 'success' : 'danger'%> " role="alert">
+        <%= datos.mensaje%>
+    </div>
+    <%}%>
+    <h1><%= estaEditando ? 'Editando ' + datos.parque.nombre : 'Crear Parque'%></h1>
+    <form action=/parque<%= estaEditando ? '/'+datos.parque.id : ''%> method="POST">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label for="nombre">
+                        Nombre del Parque
+                    </label>
+                    <input id="nombre" type="text" name="nombre" value="<%= estaEditando ? datos.parque.nombre : ''%>"
+                        class="form-control" placeholder="Ej:Parque La Carolina" title="Ingresar Nombre del Parque">
+                    <small id="nombreIDHelp" class="form-text text-muted">
+                        Ingresa un nombre mayor a 3 caracteres
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="area">
+                        Area del Parque
+                    </label>
+                    <input id="area" type="number" name="area" value="<%= estaEditando ? datos.parque.area : ''%>"
+                        class="form-control" placeholder="Ej: 100" title="Ingresar el area del parque">
+                    <small id="areaIDHelp" class="form-text text-muted">
+                        Ingresar el area del parque
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="ciudad">
+                        Ciudad del Parque
+                    </label>
+                    <input id="ciudad" type="text" name="ciudad" value="<%= estaEditando ? datos.parque.ciudad : ''%>"
+                        class="form-control" placeholder="Ej: Quito" title="Ingresar la ciudad del parque">
+                    <small id="ciudadIDHelp" class="form-text text-muted">
+                        Ingresar la ciudad del parque
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="codigoPostal">
+                        Codigo Postal del Parque
+                    </label>
+                    <input id="codigoPostal" type="text" name="codigoPostal"
+                        value="<%= estaEditando ? datos.parque.codigoPostal : ''%>" class="form-control"
+                        placeholder="Ej: 8491697" title="Ingresar el codigo postal del parque">
+                    <small id="codigoPostalIDHelp" class="form-text text-muted">
+                        Ingresar el codigo postal del parque
+                    </small>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label for="descripcion">
+                        Descripcion del Parque
+                    </label>
+                    <input id="descripcion" type="text" name="descripcion"
+                        value="<%= estaEditando ? datos.parque.descripcion : ''%>" class="form-control"
+                        placeholder="Ej: El parque cuenta con ...." title="Ingresar la descripcion del Parque">
+                    <small id="descripcionIDHelp" class="form-text text-muted">
+                        Ingresa una breve descripcion del parque.
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="direccion">
+                        Direccion del Parque
+                    </label>
+                    <input id="direccion" type="text" name="direccion"
+                        value="<%= estaEditando ? datos.parque.direccion : ''%>" class="form-control"
+                        placeholder="Ej: Av. Siempre Viva" title="Ingresar la direccion del parque">
+                    <small id="direccionIDHelp" class="form-text text-muted">
+                        Ingresar la direccion del parque
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="sector">
+                        Sector del Parque
+                    </label>
+                    <input id="sector" type="text" name="sector" value="<%= estaEditando ? datos.parque.ciudad : ''%>"
+                        class="form-control" placeholder="Ej: Barrio Miraflores" title="Ingresar el sector del parque">
+                    <small id="sectorIDHelp" class="form-text text-muted">
+                        Ingresar el sector en donde se ubica el parque
+                    </small>
+                </div>
+
+            </div>
+        </div>
+
+
+        <button type="submit" class="btn btn-success">
+            Guardar
+        </button>
+        <button type="submit" class="btn btn-secondary">
+            Limpiar Formulario
+        </button>
+    </form>
+</div>
+<%- include('../../compartido/pie-de-pagina')%>

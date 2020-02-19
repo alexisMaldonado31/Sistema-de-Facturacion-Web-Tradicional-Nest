@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString, Min, MinLength, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, Min, MinLength, IsBoolean, IsNumberString } from 'class-validator';
 
 export class ParqueCreateDto{
 
@@ -31,11 +31,4 @@ export class ParqueCreateDto{
   @Min(100)
   area: number
 
-  @IsNotEmpty()
-  @IsString()
-  parqueTipo: string
-
-  @IsNotEmpty()
-  @IsBoolean()
-  esDestinoTuristico: boolean
 }

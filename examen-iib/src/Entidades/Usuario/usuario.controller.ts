@@ -19,6 +19,7 @@ export class UsuarioController {
         @Session() session,
         @Res() res
     ) {
+        console.log(username, password);
         let usuarioValidado = await this._usuarioService.validarUsuario(username, password);
         console.log(usuarioValidado);
         if (usuarioValidado.validado) {
@@ -27,12 +28,20 @@ export class UsuarioController {
                 userId: usuarioValidado.id,
                 roles: [usuarioValidado.rol]
             }
-            res.send('ok');
+            console.log(session.usuario);
+            res.render('parque/rutas/ruta-crear-parque',
+            {
+                datos:{
+                    tipoMensaje : 0,
+                }
+            }
+        );
         }else{
             res.send('No se encuentra registrado');
         }
 
         throw new BadRequestException('No envia credenciales')
+
     }
 
     @Get('logout')

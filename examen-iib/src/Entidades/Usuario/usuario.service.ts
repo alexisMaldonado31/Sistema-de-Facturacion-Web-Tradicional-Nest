@@ -36,11 +36,7 @@ export class UsuarioService{
             usuario = await this._repositorioUsuario.findOne({
                 where: {"username": username}
             });
-            console.log(usuario.password);
-            console.log(password);
             if(password === usuario.password){
-                console.log('ver usuario');
-                console.log(usuarioValidado);
                 usuarioValidado.id = usuario.id;
                 usuarioValidado.username = usuario.username;
                 usuarioValidado.rol = usuario.rol;

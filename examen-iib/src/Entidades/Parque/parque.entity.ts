@@ -61,21 +61,7 @@ export class ParqueEntity{
         nullable: false,
         name: 'parque_area',
     })
-    area: number;
-
-    @Column({
-        type: 'varchar',
-        nullable: false,
-        name: 'parque_tipo',
-    })
-    tipo: string;
-
-    @Column({
-        type: 'boolean',
-        nullable: false,
-        name: 'parque_es_destino_turistico',
-    })
-    esDestinoTuristico: boolean;
+    area: string;
 
      @OneToMany(
          type => ParejaEntity,

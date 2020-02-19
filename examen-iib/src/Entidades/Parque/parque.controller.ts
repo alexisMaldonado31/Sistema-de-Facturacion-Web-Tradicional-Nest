@@ -4,6 +4,7 @@ import { ParqueService } from './parque.service';
 import { ParqueEntity } from './parque.entity';
 import { ParqueCreateDto } from './parque.create-dto';
 import { ParqueUpdateDto } from './parque.update-dto';
+import { Like } from 'typeorm';
 
 @Controller('parque')
 export class ParqueController {
@@ -12,24 +13,68 @@ export class ParqueController {
   ) {
   }
 
+  @Get('ruta/mostrar-parques')
+  async rutaMostrarParque(
+    @Query('mensaje') mensaje: string,
+    @Query('error') error: string,
+    @Query('consultarParque') consultarParque: string,
+    @Res() res,
+  ) {
+    let consultaServicio;
+    if (consultarParque) {
+      consultaServicio = [
+        {
+          nombre: Like('%' + consultarParque + '%')
+        },
+        {
+          ciudad: Like('%' + consultarParque + '%')
+        },
+        {
+          codigoPostal: Like('%' + consultarParque + '%')
+        }
+      ];
+    }
+    const parques = await this._parqueService.buscarParques(consultaServicio);
+    res.render('parque/rutas/ruta-mostrar-parque',
+      {
+        datos: {
+          parques,
+          mensaje,
+          error
+        }
+      }
+    );
+  }
+
+  @Get('ruta/crear-parque')
+  rutaCrearParque(
+    @Res() res,
+    @Query() tipoMensaje
+  ) {
+    res.render('parque/rutas/ruta-crear-parque',
+      {
+        datos: {
+          tipoMensaje: 0,
+        }
+      }
+    );
+  }
+
   @Post()
   async ingresarParque(
     @Body() parque: ParqueEntity,
     @Res() res,
-    @Session() session
+    @Session() session,
   ): Promise<void> {
     if (session) {
-      console.log(session);
       if (session.usuario.roles.includes('Administrador')) {
         const parqueCreateDto = new ParqueCreateDto();
         parqueCreateDto.nombre = parque.nombre;
-        parqueCreateDto.area = parque.area;
+        parqueCreateDto.area = +parque.area;
         parqueCreateDto.ciudad = parque.ciudad;
         parqueCreateDto.codigoPostal = parque.codigoPostal;
         parqueCreateDto.descripcion = parque.descripcion;
         parqueCreateDto.direccion = parque.direccion;
-        parqueCreateDto.esDestinoTuristico = parque.esDestinoTuristico;
-        parqueCreateDto.parqueTipo = parque.tipo;
         parqueCreateDto.sector = parque.sector;
         const errores = await validate(parqueCreateDto);
         if (errores.length > 0) {
@@ -37,13 +82,28 @@ export class ParqueController {
         } else {
           try {
             await this._parqueService.crearParque(parque);
-            res.send('OK');
+            res.render('parque/rutas/ruta-crear-parque', {
+              datos: {
+                tipoMensaje: 1,
+                mensaje: "El parque se ingreso Correctamente"
+              }
+            });
           } catch (e) {
-            throw new BadRequestException('No se puede ingresar el parque');
+            res.render('parque/rutas/ruta-crear-parque', {
+              datos: {
+                tipoMensaje: 2,
+                mensaje: "El parque no se pudo Ingresar"
+              }
+            });
           }
         }
       } else {
-        res.send("No cuenta con permisos de Administrador");
+        res.render('parque/rutas/ruta-crear-parque', {
+          datos: {
+            tipoMensaje: 2,
+            mensaje: "No cuenta con permisos de administrador"
+          }
+        });
       }
     }
   }
@@ -86,6 +146,51 @@ export class ParqueController {
   }
 
   @Post(':id')
+  async eliminarParque(
+    @Param('id') id: string,
+    @Res() res,
+    @Session() session
+  ): Promise<void> {
+    if (session) {
+      if (session.usuario.roles.includes('Administrador')) {
+        try {
+          await this._parqueService.borrarParque(+id);
+          const parques = await this._parqueService.buscarParques();
+          res.render('parque/rutas/ruta-mostrar-parque',
+            {
+              datos: {
+                parques,
+                mensaje: "El Parque ha sido borrado",
+              }
+            }
+          );
+        } catch (e) {
+          const parques = await this._parqueService.buscarParques();
+          res.render('parque/rutas/ruta-mostrar-parque',
+            {
+              datos: {
+                parques,
+                error: "No se ha podido borrar el Parque"
+              }
+            }
+          );
+        }
+      } else {
+        const parques = await this._parqueService.buscarParques();
+        res.render('parque/rutas/ruta-mostrar-parque',
+          {
+            datos: {
+              parques,
+              error: "No tiene permisos de administrador"
+            }
+          }
+        );
+      }
+    }
+
+  }
+
+  @Post(':id')
   async actualizarParque(
     @Body() parque: ParqueEntity,
     @Param('id') id: string,
@@ -93,18 +198,15 @@ export class ParqueController {
     @Session() session
   ): Promise<void> {
     if (session) {
-      console.log(session);
       if (session.usuario.roles.includes('Administrador')) {
         const parqueUpdateDto = new ParqueUpdateDto();
         parqueUpdateDto.nombre = parque.nombre;
-        parqueUpdateDto.area = parque.area;
+        parqueUpdateDto.area = +parque.area;
         parqueUpdateDto.ciudad = parque.ciudad;
         parqueUpdateDto.codigoPostal = parque.codigoPostal;
         parqueUpdateDto.descripcion = parque.descripcion;
         parqueUpdateDto.direccion = parque.direccion;
-        parqueUpdateDto.esDestinoTuristico = parque.esDestinoTuristico;
         parqueUpdateDto.id = +id;
-        parqueUpdateDto.parqueTipo = parque.tipo;
         parqueUpdateDto.sector = parque.sector;
         const errores = await validate(parqueUpdateDto);
         if (errores.length > 0) {
@@ -120,24 +222,5 @@ export class ParqueController {
 
   }
 
-  @Post(':id')
-  async eliminarParque(
-    @Param('id') id: string,
-    @Res() res,
-    @Session() session
-  ): Promise<void> {
-    if (session) {
-      if (session.usuario.roles.includes('Administrador')) {
-        try {
-          await this._parqueService.borrarParque(+id);
-          res.send('Ok');
-        } catch (error) {
-          throw new BadRequestException();
-        }
-      } else {
-        res.send("No cuenta con permisos de Administrador");
-      }
-    }
 
-  }
 }
