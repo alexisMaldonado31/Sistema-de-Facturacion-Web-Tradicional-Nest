@@ -47,30 +47,30 @@
         </div>
         <select class="custom-select" id="sonCasados" name="sonCasados">
             <option selected>Choose...</option>
-            <option value="1">Si</option>
-            <option value="0">No</option>
+            <option value="1" <%= estaEditando && datos.pareja.sonCasados? "selected" : "" %> >Si</option>
+            <option value="0" <%= estaEditando && !datos.pareja.sonCasados? "selected" : "" %>>No</option>
         </select>
         <small id="sonCasadosIDHelp" class="form-text text-muted">
             Seleccione si son casados o no
         </small>
 
-        <% let select=document.getElementById("sonCasados"); 
-        console.log(select);
-        select[0].selected = true;
-        %> 
 
         <div class="input-group-prepend">
             <label for="parque">Parque</label>
         </div>
         <select class="custom-select" id="parque" name="parque">
-            <option selected><%= estaEditando ? datos.pareja.parque.nombre : ''%></option>
+            <option selected>Choose...</option>
             <%datos.parques.forEach(parque => {%>
-            <option value='<%= parque.id %>'><%=parque.nombre%> </option>
+            <option value='<%= parque.id %>' <%= estaEditando && parque.id === datos.pareja.parque.id ? "selected" : "" %> >
+                <%=parque.nombre%> 
+            </option>
             <%});%>
         </select>
         <small id="parqueIDHelp" class="form-text text-muted">
             Ingresar el parque de la pareja
         </small>
+
+
 
         <button type="submit" class="btn btn-success">
             Guardar
@@ -80,6 +80,7 @@
         </button>
         </form>
 </div>
+
 
 
 
