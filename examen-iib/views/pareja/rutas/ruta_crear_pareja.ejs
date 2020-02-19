@@ -1,0 +1,88 @@
+<%- include('../../compartido/cabecera')%>
+<% const estaEditando = datos.pareja ? true: false;%>
+
+<div class="container">
+    <%if(datos.tipoMensaje != 0){%>
+    <div class="alert alert-<%= datos.tipoMensaje == 1 ? 'success' : 'danger'%> " role="alert">
+        <%= datos.mensaje%>
+    </div>
+    <%}%>
+    <h1><%= estaEditando ? 'Editando ' + datos.pareja.nombre : 'Crear Pareja'%></h1>
+    <form action=/pareja<%= estaEditando ? '/'+datos.pareja.id : ''%> method="POST">
+        <div class="form-group">
+            <label for="nombre">
+                Nombre de la Pareja
+            </label>
+            <input id="nombre" type="text" name="nombre" value="<%= estaEditando ? datos.pareja.nombre : ''%>"
+                class="form-control" placeholder="Ej:Benitez Valencia" title="Ingresar Nombre de la Pareja">
+            <small id="nombreIDHelp" class="form-text text-muted">
+                Ingresa un nombre mayor a 3 caracteres
+            </small>
+        </div>
+
+        <div class="form-group">
+            <label for="anios">
+                Años de la Pareja
+            </label>
+            <input id="anios" type="number" name="anios" value="<%= estaEditando ? datos.pareja.anios : ''%>"
+                class="form-control" placeholder="Ej: 100" title="Ingresar el area del parque">
+            <small id="areaIDHelp" class="form-text text-muted">
+                Ingresa los años de la pareja
+            </small>
+        </div>
+
+        <div class="form-group">
+            <label for="precio">
+                Precio del Parque
+            </label>
+            <input id="precio" type="text" name="precio" value="<%= estaEditando ? datos.pareja.precio : ''%>"
+                class="form-control" placeholder="Ej: 5.2" title="Ingresar el precio de la pareja">
+            <small id="precioIDHelp" class="form-text text-muted">
+                Ingresar el precio de la pareja
+            </small>
+        </div>
+
+        <div class="input-group-prepend">
+            <label for="sonCasados">Son Casados</label>
+        </div>
+        <select class="custom-select" id="sonCasados" name="sonCasados">
+            <option selected>Choose...</option>
+            <option value="1">Si</option>
+            <option value="0">No</option>
+        </select>
+        <small id="sonCasadosIDHelp" class="form-text text-muted">
+            Seleccione si son casados o no
+        </small>
+
+        <% let select=document.getElementById("sonCasados"); 
+        console.log(select);
+        select[0].selected = true;
+        %> 
+
+        <div class="input-group-prepend">
+            <label for="parque">Parque</label>
+        </div>
+        <select class="custom-select" id="parque" name="parque">
+            <option selected><%= estaEditando ? datos.pareja.parque.nombre : ''%></option>
+            <%datos.parques.forEach(parque => {%>
+            <option value='<%= parque.id %>'><%=parque.nombre%> </option>
+            <%});%>
+        </select>
+        <small id="parqueIDHelp" class="form-text text-muted">
+            Ingresar el parque de la pareja
+        </small>
+
+        <button type="submit" class="btn btn-success">
+            Guardar
+        </button>
+        <button type="submit" class="btn btn-secondary">
+            Limpiar Formulario
+        </button>
+        </form>
+</div>
+
+
+
+
+</div>
+<%- include('../../compartido/pie-de-pagina')%>

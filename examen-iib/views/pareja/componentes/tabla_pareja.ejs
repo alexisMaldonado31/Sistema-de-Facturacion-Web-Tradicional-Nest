@@ -1,0 +1,55 @@
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Nombre</th>
+        <th scope="col">Años</th>
+        <th scope="col">Casados</th>
+        <th scope="col">Precio</th>
+        <th scope="col">Parque</th>
+        <th scope="col">Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%parejas.forEach( pareja => {%>
+        <tr>
+            <th scope="row">   
+                <%= pareja.id  %>              
+            </th>
+            <td>
+                <%= pareja.nombre%>
+            </td>
+            <td>
+                <%= pareja.anios%>
+            </td>
+            <td>
+                <%= pareja.sonCasados%>
+            </td>
+            <td>
+                <%= pareja.precio%>
+            </td>
+            <td>
+                <%= pareja.parque.nombre %> 
+            </td>
+            <td>
+
+                <a href="/pareja/ruta/editar-pareja/<%= pareja.id%>">
+                    <button type="button"
+                            class="btn btn-info">
+                        Editar
+                    </button>
+                </a>
+                <form action="/pareja/eliminar/<%= pareja.id%>"
+                      method="POST"
+                >
+                    <button type="submit"
+                            class="btn btn-danger">
+                        Eliminar
+                    </button>
+                </form>
+
+            </td>
+        </tr>
+    <%})%>
+    </tbody>
+</table>

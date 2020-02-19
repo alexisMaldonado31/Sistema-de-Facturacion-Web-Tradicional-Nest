@@ -4,12 +4,87 @@ import { ParejaService } from './pareja.service';
 import { ParejaEntity } from './pareja.entity';
 import { ParejaCreateDto } from './pareja.create-dto';
 import { ParejaUpdateDto } from './pareja.update-dto';
+import { Like } from 'typeorm';
+import { ParqueService } from '../Parque/parque.service';
 
 @Controller('pareja')
 export class ParejaController {
   constructor(
-    private readonly _parejaService: ParejaService
+    private readonly _parejaService: ParejaService,
+    private readonly _parqueService: ParqueService
   ) {
+  }
+
+  @Get('ruta/mostrar-parejas')
+  async rutaMostrarPareja(
+    @Query('mensaje') mensaje: string,
+    @Query('error') error: string,
+    @Query('consultarPareja') consultarPareja: string,
+    @Res() res,
+  ) {
+    let consultaServicio;
+    if (consultarPareja) {
+      consultaServicio = [
+        {
+          nombre: Like('%' + consultarPareja + '%')
+        },
+        {
+          anios: Like('%' + consultarPareja + '%')
+        },
+      ];
+    }
+
+    const parejas = await this._parejaService.buscarParejas(consultaServicio)
+    console.log(parejas);
+    res.render('pareja/rutas/ruta_mostrar_pareja',
+      {
+        datos: {
+          parejas,
+          mensaje,
+          error
+        }
+      }
+    );
+  }
+
+  @Get('ruta/crear-pareja')
+  async rutaCrearPareja(
+    @Res() res,
+  ) {
+    const parques = await this._parqueService.buscarParques();
+    res.render('pareja/rutas/ruta_crear_pareja',
+      {
+        datos: {
+          parques,
+          tipoMensaje: 0,
+        }
+      }
+    );
+  }
+
+  @Get('ruta/editar-pareja/:idPareja')
+  async rutaEditarPareja(
+    @Param('idPareja') idPareja: string,
+    @Res() res,
+  ) {
+    const pareja = await this._parejaService.buscarUnaPareja(+idPareja);
+    const parques = await this._parqueService.buscarParques();
+    try {
+      if (pareja) {
+        res.render('pareja/rutas/ruta_crear_pareja',
+          {
+            datos: {
+              tipoMensaje: 0,
+              pareja,
+              parques
+            }
+          }
+        );
+
+      }
+    } catch (e) {
+
+    }
   }
 
   @Post()
@@ -19,26 +94,59 @@ export class ParejaController {
     @Session() session
   ): Promise<void> {
     if (session) {
+      const parques = await this._parqueService.buscarParques();
       if (session.usuario.roles.includes('Administrador')) {
         const parejaCreateDto = new ParejaCreateDto();
         parejaCreateDto.nombre = pareja.nombre;
-        parejaCreateDto.anios = pareja.anios;
+        parejaCreateDto.anios = +pareja.anios;
         parejaCreateDto.sonCasados = pareja.sonCasados;
-        parejaCreateDto.precio = pareja.precio;
+        parejaCreateDto.precio = +pareja.precio;
 
         const errores = await validate(parejaCreateDto);
         if (errores.length > 0) {
-          throw new BadRequestException(errores);
+          res.render('pareja/rutas/ruta_crear_pareja',
+            {
+              datos: {
+                parques,
+                tipoMensaje: 2,
+                mensaje: "Error en los datos ingresados"
+              }
+            }
+          );
         } else {
           try {
             await this._parejaService.crearPareja(pareja);
-            res.send('OK');
+            res.render('pareja/rutas/ruta_crear_pareja',
+              {
+                datos: {
+                  parques,
+                  tipoMensaje: 1,
+                  mensaje: "La Pareja a sido ingresada correctamente"
+                }
+              }
+            );
           } catch (e) {
-            throw new BadRequestException('No se puede ingresar el parque');
+            res.render('pareja/rutas/ruta_crear_pareja',
+              {
+                datos: {
+                  parques,
+                  tipoMensaje: 2,
+                  mensaje: "Error en el ingreso de la pareja"
+                }
+              }
+            );
           }
         }
       } else {
-        res.send("No cuenta con permisos de Administrador");
+        res.render('pareja/rutas/ruta_crear_pareja',
+          {
+            datos: {
+              parques,
+              tipoMensaje: 2,
+              mensaje: "No tiene permisos de administrador"
+            }
+          }
+        );
       }
     }
   }
@@ -88,28 +196,70 @@ export class ParejaController {
     @Session() session
   ): Promise<void> {
     if (session) {
+      const parques = await this._parqueService.buscarParques();
       if (session.usuario.roles.includes('Administrador')) {
         const parejaUpdateDto = new ParejaUpdateDto();
         parejaUpdateDto.nombre = pareja.nombre;
-        parejaUpdateDto.anios = pareja.anios;
+        parejaUpdateDto.anios = +pareja.anios;
         parejaUpdateDto.sonCasados = pareja.sonCasados;
-        parejaUpdateDto.precio = pareja.precio;
+        parejaUpdateDto.precio = +pareja.precio;
         parejaUpdateDto.id = +id;
         const errores = await validate(parejaUpdateDto);
         if (errores.length > 0) {
-          throw new BadRequestException();
+          res.render('pareja/rutas/ruta_crear_pareja',
+            {
+              datos: {
+                pareja,
+                parques,
+                tipoMensaje: 2,
+                mensaje: errores
+              }
+            }
+          );
         } else {
-          await this._parejaService.actualizarParejas(+id, pareja);
-          res.send('Ok')
+          try{
+            const parejaEditar = await this._parejaService.actualizarParejas(+id, pareja);
+            res.render('pareja/rutas/ruta_crear_pareja',
+              {
+                datos: {
+                  parques,
+                  pareja: parejaEditar,
+                  tipoMensaje: 1,
+                  mensaje: "La Pareja a sido modificada correctamente"
+                }
+              }
+            );
+          }catch(e){
+            res.render('pareja/rutas/ruta_crear_pareja',
+            {
+              datos: {
+                pareja,
+                parques,
+                tipoMensaje: 2,
+                mensaje: "No se pudo modificar la pareja"
+              }
+            }
+          );
+          }
+          
         }
       } else {
-        res.send("No cuenta con permisos de Administrador");
+        res.render('pareja/rutas/ruta_crear_pareja',
+          {
+            datos: {
+              pareja,
+              parques,
+              tipoMensaje: 2,
+              mensaje: "No tiene permisos de Administrador"
+            }
+          }
+        );
       }
     }
 
   }
 
-  @Post(':id')
+  @Post('eliminar/:id')
   async eliminarPareja(
     @Param('id') id: string,
     @Res() res,
@@ -119,7 +269,15 @@ export class ParejaController {
       if (session.usuario.roles.includes('Administrador')) {
         try {
           await this._parejaService.borrarPareja(+id);
-          res.send('Ok');
+          const parejas = await this._parejaService.buscarParejas();
+          res.render('pareja/rutas/ruta_mostrar_pareja',
+            {
+              datos: {
+                parejas,
+                mensaje: "La Pareja ha sido eliminada",
+              }
+            }
+          );
         } catch (error) {
           throw new BadRequestException();
         }

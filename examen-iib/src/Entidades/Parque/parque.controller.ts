@@ -109,7 +109,7 @@ export class ParqueController {
   }
 
   @Get('ruta/editar-parque/:idUsuario')
-  async rutaEditarUsuario(
+  async rutaEditarParque(
     @Param('idUsuario') idUsuario: string,
     @Res() res,
   ) {
