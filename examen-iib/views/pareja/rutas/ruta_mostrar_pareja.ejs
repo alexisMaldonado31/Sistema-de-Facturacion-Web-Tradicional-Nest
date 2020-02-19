@@ -1,0 +1,49 @@
+<%- include('../../compartido/cabecera')%>
+<div class="container">
+
+    <%if(datos.mensaje){%>
+        <div class="alert alert-success" role="alert">
+            <%= datos.mensaje%>
+        </div>
+    <%}%>
+
+    <%if(datos.error){%>
+        <div class="alert alert-danger" role="alert">
+            <%= datos.error%>
+        </div>
+    <%}%>
+
+    <a href="/pareja/ruta/crear-pareja">
+        <button type="button"
+                class="btn btn-primary">
+            Crear Pareja
+        </button>
+    </a>
+
+    <form action="/pareja/ruta/mostrar-parejas"
+          method="get"
+    >
+        <div class="form-group">
+            <label for="buscarID">
+                Buscar Pareja
+            </label>
+            <input id="buscarID"
+                   type="text"
+                   name="consultarPareja"
+                   placeholder="Ej: Benitez Valencia o 10"
+                   title="Ingresar la busqueda por nombre o años"
+                   class="form-control">
+            <small id="nombreIDHelp"
+                   class="form-text text-muted">
+                Puede buscar por nombre o años de la pareja
+            </small>
+        </div>
+    </form>
+
+    <%- include('../componentes/tabla_pareja',
+    {
+     parejas:datos.parejas
+    }
+    )%>
+</div>
+<%- include('../../compartido/pie-de-pagina')%>

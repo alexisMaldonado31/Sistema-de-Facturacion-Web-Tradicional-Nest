@@ -22,7 +22,7 @@ export class ParejaEntity{
         nullable: false,
         name: 'pareja_anios'        
     })
-    anios: number;
+    anios: string;
 
     @Column({
         type: 'boolean',
@@ -38,7 +38,7 @@ export class ParejaEntity{
         scale:2,
         name: 'pareja_precio'
     })
-    precio: number;
+    precio: string;
 
     @ManyToOne(
         type => ParqueEntity,

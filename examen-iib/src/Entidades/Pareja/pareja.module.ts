@@ -3,11 +3,14 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { ParejaEntity } from "./pareja.entity";
 import { ParejaService } from "./pareja.service";
 import { ParejaController } from "./pareja.controller";
+import { ParqueService } from "../Parque/parque.service";
+import { ParqueEntity } from "../Parque/parque.entity";
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([
-            ParejaEntity
+            ParejaEntity,
+            ParqueEntity
         ],
         'default'
         )
@@ -16,10 +19,12 @@ import { ParejaController } from "./pareja.controller";
         ParejaController
     ],
     providers: [
-        ParejaService
+        ParejaService,
+        ParqueService
     ],
     exports: [
-        ParejaService
+        ParejaService,
+        ParqueService
     ]
 })
 export class ParejaModule{}

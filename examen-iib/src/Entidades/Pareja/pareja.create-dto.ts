@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString, Min, MinLength, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, Min, MinLength, IsBoolean, IsBooleanString, IsNumberString } from 'class-validator';
 
 export class ParejaCreateDto{
 
@@ -11,7 +11,7 @@ export class ParejaCreateDto{
   anios: number
 
   @IsNotEmpty()
-  @IsBoolean()
+  @IsBooleanString()
   sonCasados: boolean
 
   @IsNotEmpty()
