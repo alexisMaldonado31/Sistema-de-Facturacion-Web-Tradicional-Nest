@@ -108,6 +108,43 @@ export class ParqueController {
     }
   }
 
+  @Get('ruta/editar-parque/:idUsuario')
+  async rutaEditarUsuario(
+    @Param('idUsuario') idUsuario: string,
+    @Res() res,
+  ) {
+    const parque = await this._parqueService.buscarUnParque(+idUsuario);
+    try {
+      if (parque) {
+        res.render('parque/rutas/ruta-crear-parque',
+          {
+            datos: {
+              tipoMensaje : 0,
+              parque 
+            }
+          }
+        );
+      } else {
+        res.render('parque/rutas/ruta-crear-parque', {
+          datos: {
+            tipoMensaje: 2,
+            mensaje: "El parque no se pudo modificar",
+            parque
+          }
+        });
+      }
+
+    } catch (e) {
+      res.render('parque/rutas/ruta-crear-parque', {
+        datos: {
+          tipoMensaje: 2,
+          mensaje: "No tiene permisos de Administrador",
+          parque
+        }
+      });
+    }
+  }
+
   @Get(':id')
   buscarUnParque(
     @Param('id') id: string,
@@ -145,7 +182,7 @@ export class ParqueController {
     );
   }
 
-  @Post(':id')
+  @Post('eliminar/:id')
   async eliminarParque(
     @Param('id') id: string,
     @Res() res,
@@ -198,6 +235,7 @@ export class ParqueController {
     @Session() session
   ): Promise<void> {
     if (session) {
+      console.log('editando');
       if (session.usuario.roles.includes('Administrador')) {
         const parqueUpdateDto = new ParqueUpdateDto();
         parqueUpdateDto.nombre = parque.nombre;
@@ -210,13 +248,35 @@ export class ParqueController {
         parqueUpdateDto.sector = parque.sector;
         const errores = await validate(parqueUpdateDto);
         if (errores.length > 0) {
-          throw new BadRequestException();
+          res.render('parque/rutas/ruta-crear-parque',
+          {
+            datos: {
+              tipoMensaje : 2,
+              mensaje: "No se pudo actualizar el parque. Datos erroneos",
+              parque 
+            }
+          });
         } else {
-          await this._parqueService.actualizarParque(+id, parque);
-          res.send('Ok')
+          const parqueActualizado = await this._parqueService.actualizarParque(+id, parque);
+          res.render('parque/rutas/ruta-crear-parque',
+          {
+            datos: {
+              tipoMensaje : 1,
+              mensaje: "El Parque ha sido actualizado con exito",
+              parque: parqueActualizado 
+            }
+          }
+        );
         }
       } else {
-        res.send("No cuenta con permisos de Administrador");
+        res.render('parque/rutas/ruta-crear-parque',
+          {
+            datos: {
+              tipoMensaje : 2,
+              mensaje: "No cuenta con permisos de administrador",
+              parque 
+            }
+          });
       }
     }
 

@@ -41,13 +41,13 @@
             </td>
             <td>
 
-                <a href="/parque/ruta/editar-usuario/<%= parque.id%>">
+                <a href="/parque/ruta/editar-parque/<%= parque.id%>">
                     <button type="button"
                             class="btn btn-info">
                         Editar
                     </button>
                 </a>
-                <form action="/parque/<%= parque.id%>"
+                <form action="/parque/eliminar/<%= parque.id%>"
                       method="POST"
                 >
                     <button type="submit"

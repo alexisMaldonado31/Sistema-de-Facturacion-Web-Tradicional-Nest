@@ -48,10 +48,11 @@ export class UsuarioController {
     logout(
         @Session() session,
         @Req() req,
+        @Res() res
     ){
         session.usuario = undefined;
         req.session.destroy();
-        return session
+        res.render('login/login');
     }
 
     @Post()

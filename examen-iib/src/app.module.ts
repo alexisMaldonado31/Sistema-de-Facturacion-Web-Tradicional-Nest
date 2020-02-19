@@ -25,7 +25,7 @@ import { UsuarioModule } from './Entidades/Usuario/usuario.module';
           name: 'default',
           type: 'mysql',
           host: '127.0.0.1',
-          port: 32769,
+          port: 32770,
           username: 'root',
           password: 'root',
           database: 'examen',
