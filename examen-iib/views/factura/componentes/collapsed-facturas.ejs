@@ -1,0 +1,46 @@
+
+<div class="container">
+    <div class="accordion" id="accordionExample">
+        <% datos.facturas.forEach(factura=> {%> 
+            <div class="card">
+                <div class="card-header" id="heading<%= factura.id%>">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse<%= factura.id%>" aria-expanded="true" aria-controls="collapseOne">
+                            Num. Factura: <%= factura.id%>
+                        </button>
+                        <h6>
+                            &nbsp &nbsp Fecha: <%= factura.fecha%> &nbsp &nbsp &nbsp &nbsp&nbsp &nbsp Total: <%= factura.total%>
+                        </h6>
+                        <h6>
+                            &nbsp &nbsp Direccion: <%= factura.direccion%>
+                        </h6>
+                        <%if(!factura.estado){%>
+                            <form action="/factura/finalizar/<%=factura.id%>" method="POST">
+                                <button type="submit" class="btn btn-success">
+                                    Finalizar
+                                </button>
+                            </form>
+                            <a href="/detallefactura/ruta-ver-factura/<%=factura.id%> ">
+                                <button type="button" class="btn btn-info">
+                            Completar Factura
+                            </button>
+                        </a>
+                        <% } %>  
+                    </h2>                    
+                </div>
+                <div id="collapse<%= factura.id%>" class="collapse" aria-labelledby="heading<%= factura.id%>" data-parent="#accordionExample">
+                    <div class="card-body">
+                        <%- include('../componentes/ver-detalles',
+                        {
+                            datos:{
+                                detalles: factura.detalles
+                            }
+                        }
+                        )%>
+                    </div>
+                </div>
+            </div>
+            <%})%>
+        
+    </div>
+</div>

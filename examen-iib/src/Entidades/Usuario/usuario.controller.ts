@@ -19,24 +19,28 @@ export class UsuarioController {
         @Session() session,
         @Res() res
     ) {
-        console.log(username, password);
+
         let usuarioValidado = await this._usuarioService.validarUsuario(username, password);
-        console.log(usuarioValidado);
         if (usuarioValidado.validado) {
             session.usuario = {
                 nombre: usuarioValidado.username,
                 userId: usuarioValidado.id,
                 roles: [usuarioValidado.rol]
             }
-            console.log(session.usuario);
-            res.render('parque/rutas/ruta-crear-parque',
-            {
-                datos:{
-                    tipoMensaje : 0,
-                }
+            if (usuarioValidado.rol === "Administrador") {
+                res.render('parque/rutas/ruta-crear-parque',
+                    {
+                        datos: {
+                            tipoMensaje: 0,
+                        }
+                    }
+                );
+            } else {
+                res.render('factura/rutas/ruta-crear-factura'
+                );
             }
-        );
-        }else{
+
+        } else {
             res.send('No se encuentra registrado');
         }
 
@@ -49,7 +53,7 @@ export class UsuarioController {
         @Session() session,
         @Req() req,
         @Res() res
-    ){
+    ) {
         session.usuario = undefined;
         req.session.destroy();
         res.render('login/login');
@@ -61,8 +65,8 @@ export class UsuarioController {
         @Res() res,
         @Session() session
     ): Promise<void> {
-        if(session){
-            if(session.usuario.roles.includes('Administrador')){
+        if (session) {
+            if (session.usuario.roles.includes('Administrador')) {
                 const usuarioCreateDto = new UsuarioCreateDto();
                 usuarioCreateDto.username = usuario.username;
                 usuarioCreateDto.password = usuario.password;
@@ -78,11 +82,11 @@ export class UsuarioController {
                         throw new BadRequestException('No se puede ingresar el usuario');
                     }
                 }
-            }else{
+            } else {
                 res.send('No cuenta con permisos de Administrador');
             }
         }
-        
+
     }
 
     @Get(':id')
@@ -129,8 +133,8 @@ export class UsuarioController {
         @Res() res,
         @Session() session
     ): Promise<void> {
-        if(session){
-            if(session.usuario.roles.includes('Administrador')){
+        if (session) {
+            if (session.usuario.roles.includes('Administrador')) {
                 const usuarioUpdateDto = new UsuarioUpdateDto();
                 usuarioUpdateDto.username = usuario.username;
                 usuarioUpdateDto.password = usuario.password;
@@ -142,8 +146,8 @@ export class UsuarioController {
                 } else {
                     await this._usuarioService.actualizarUsuario(+id, usuario);
                     res.send('Ok')
-                }        
-            }else{
+                }
+            } else {
                 res.send('No cuenta con permisos de Administrador');
             }
         }
@@ -155,20 +159,20 @@ export class UsuarioController {
         @Res() res,
         @Session() session
     ): Promise<void> {
-        if(session){
-            if(session.usuario.roles.includes('Administrador')){
+        if (session) {
+            if (session.usuario.roles.includes('Administrador')) {
                 try {
                     await this._usuarioService.borrarUsuario(+id);
                     res.send('Ok');
                 } catch (error) {
                     throw new BadRequestException();
                 }
-            }else{
+            } else {
                 res.send('No cuenta con permisos de administrador');
             }
         }
-        
+
     }
 
-    
+
 }

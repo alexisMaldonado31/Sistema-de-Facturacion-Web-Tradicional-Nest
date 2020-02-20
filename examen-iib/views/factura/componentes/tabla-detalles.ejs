@@ -1,0 +1,41 @@
+<% console.log('aqui',datos) %> 
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Descripcion</th>
+            <th scope="col">Cantidad</th>
+            <th scope="col">Precio U</th>
+            <th scope="col">Subtotal</th>
+            <th scope="col">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <%datos.detalles.forEach( detalle => {%>
+        <tr>
+            <td>
+                <%= detalle.pareja.nombre%>
+            </td>
+            <td style="display: none;">
+                <%= detalle.pareja.id%>
+            </td>
+            <td>
+                <%= detalle.cantidad%>
+            </td>
+            <td>
+                <%= detalle.precio%>
+            </td>
+            <td>
+                <%= detalle.subtotal%>
+            </td>
+            <td>
+                <form action="/detallefactura/eliminar/<%=detalle.id %>?facturaId=<%= detalle.factura.id %>&subtotal=<%= detalle.subtotal%>" method="POST">
+                    <button type="submit" class="btn btn-danger">
+                        -
+                    </button>
+                </form>
+                
+            </td>
+        </tr>
+        <%})%>
+    </tbody>
+</table>

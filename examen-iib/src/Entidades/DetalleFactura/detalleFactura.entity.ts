@@ -15,7 +15,7 @@ export class DetalleFacturaEntity{
         nullable: false,
         name: 'cantidad',
     })
-    cantidad: number;
+    cantidad: string;
 
     @Column({
         type: 'decimal',
@@ -23,7 +23,7 @@ export class DetalleFacturaEntity{
         scale:2,
         name: 'precio',
     })
-    precio: number;
+    precio: string;
 
     @Column({
         type: 'decimal',
@@ -44,5 +44,5 @@ export class DetalleFacturaEntity{
         type=> ParejaEntity,
         pareja => pareja.detalles
     )
-    pareja: FacturaEntity
+    pareja: ParejaEntity
 }

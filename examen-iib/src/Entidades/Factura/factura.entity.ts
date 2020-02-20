@@ -35,6 +35,13 @@ export class FacturaEntity{
     })
     direccion: string;
 
+    @Column({
+        type: 'boolean',
+        nullable: false,
+        name: 'factura_estado'
+    })
+    estado: boolean
+
     @ManyToOne(
         type => UsuarioEntity,
         usuario => usuario.facturas

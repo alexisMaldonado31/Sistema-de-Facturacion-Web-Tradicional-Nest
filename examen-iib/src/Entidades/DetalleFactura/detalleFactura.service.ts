@@ -12,7 +12,13 @@ export class DetalleFacturaService {
     }
 
     crearDetalleFactura(detalleFactura: DetalleFacturaEntity) {
+        console.log('aqui stoy');
+        console.log(detalleFactura);
         return this._repositorioFactura.save(detalleFactura);
+    }
+
+    borrarDetalleFactura(id: number): Promise<DeleteResult>{
+        return this._repositorioFactura.delete(id);
     }
 
     buscarDetallesFactura(
@@ -29,7 +35,7 @@ export class DetalleFacturaService {
                 skip: skip,
                 take: take,
                 order: order,
-                relations: ["pareja"]
+                relations: ["pareja", "factura"]
             }
         );
     }

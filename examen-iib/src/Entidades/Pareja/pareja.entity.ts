@@ -44,7 +44,7 @@ export class ParejaEntity{
         type => ParqueEntity,
         parque => parque.parejas
     )
-    parque: ParejaEntity
+    parque: ParqueEntity
 
     @OneToMany(
         type => DetalleFacturaEntity,

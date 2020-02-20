@@ -1,0 +1,49 @@
+<%- include('../../compartido/cabeceraUsuarios')%>
+
+<div class="container">
+    <%if(datos.tipoMensaje != 0){%>
+    <div class="alert alert-<%= datos.tipoMensaje == 1 ? 'success' : 'danger'%> " role="alert">
+        <%= datos.mensaje%>
+    </div>
+    <%}%>
+    <h1>Crear Facturas</h1>
+    <form action="/factura" method="POST">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="fecha">
+                        Ingresar fecha
+                    </label>
+                    <input id="fecha" type="date" name="fecha" placeholder="Ej: dd-mm-aaaa" class="form-control">
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="direccion">
+                        Ingresar Direccion
+                    </label>
+                    <input id="direccion" type="text" name="direccion" placeholder="Ej: Av. Siempre Viva N70-249"
+                        class="form-control">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%if(datos.tipoMensaje == 2){%>
+                
+                <a href="/factura/ruta/mostrar-facturas">
+                        <button type="button" class="btn btn-info">
+                    Ver Facturas
+                    </button>
+                </a>
+            <%}else{ %>
+                <button type="submit" class="btn btn-primary" style="float: right;" >Guardar</button> 
+            <%}%>
+            
+        </div>
+        <hr>
+        
+    </form>
+</div>
+
+
+<%- include('../../compartido/pie-de-pagina')%>

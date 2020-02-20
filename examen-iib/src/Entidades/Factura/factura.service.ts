@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, DeleteResult } from "typeorm";
+import { Repository, DeleteResult, UpdateResult } from "typeorm";
 import { FacturaEntity } from "./factura.entity";
 
 @Injectable()
@@ -45,7 +45,24 @@ export class FacturaService {
                 where: where,
                 skip: skip,
                 take: take,
-                order: order
+                order: order,
+                relations: ["detalles", "detalles.pareja"]
+            }
+        );
+    }
+
+    editarTotal(id: number, totalFactura:number): Promise<UpdateResult>{
+        return this._repositorioFactura.update(id,
+            {
+                total : totalFactura
+            }
+        );
+    }
+
+    finalizarFactura(id:number){
+        return this._repositorioFactura.update(id,
+            {
+                estado : true
             }
         );
     }
