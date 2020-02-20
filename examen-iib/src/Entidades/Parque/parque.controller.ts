@@ -49,7 +49,6 @@ export class ParqueController {
   @Get('ruta/crear-parque')
   rutaCrearParque(
     @Res() res,
-    @Query() tipoMensaje
   ) {
     res.render('parque/rutas/ruta-crear-parque',
       {
