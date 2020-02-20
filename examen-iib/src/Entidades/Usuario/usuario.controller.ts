@@ -36,7 +36,11 @@ export class UsuarioController {
                     }
                 );
             } else {
-                res.render('factura/rutas/ruta-crear-factura'
+                res.render('factura/rutas/ruta-crear-factura',{
+                    datos: {
+                        tipoMensaje: 0,
+                    }
+                }
                 );
             }
 
