@@ -36,10 +36,24 @@ export class UsuarioController {
             }
 
         } else {
-            res.send('No se encuentra registrado');
+            res.render('login/login',
+            {
+                datos: {
+                  tipoMensaje: 2,
+                  mensaje: 'No se encuentra registrado'
+                }
+              }
+            );
         }
 
-        throw new BadRequestException('No envia credenciales')
+        res.render('login/login',
+        {
+            datos: {
+              tipoMensaje: 2,
+              mensaje: 'No envia credenciales'
+            }
+          }
+        );
 
     }
 

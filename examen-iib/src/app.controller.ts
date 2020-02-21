@@ -14,6 +14,12 @@ export class AppController {
   async rutaMostrarUsuarios(
       @Res() res,
   ){
-      res.render('login/login');
+      res.render('login/login',
+        {
+          datos: {
+            tipoMensaje: 0
+          }
+        }
+      );
   }
 }
