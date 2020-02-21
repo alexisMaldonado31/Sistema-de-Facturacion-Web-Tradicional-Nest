@@ -28,7 +28,6 @@ export class ParqueCreateDto{
 
   @IsNotEmpty()
   @IsNumber()
-  @Min(100)
   area: number
 
 }

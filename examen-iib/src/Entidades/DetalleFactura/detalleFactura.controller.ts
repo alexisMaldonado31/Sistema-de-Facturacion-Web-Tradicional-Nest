@@ -19,21 +19,28 @@ export class DetalleFacturaController {
   @Get('ruta-ver-factura/:id')
   async verFactura(
     @Res() res,
-    @Param('id') id: number 
+    @Param('id') id: number,
+    @Session() session
   ): Promise<void> {
-    let facturaCreada = await this._facturaService.buscarUnaFactura(+id);
-          var parejas = await this._parejaService.buscarParejas();
-          var detalles = await this._detalleFacturaService.buscarDetallesFactura({ factura: +id });
-    res.render('factura/rutas/ruta-crear-factura-con-detalles',
-      {
-        datos: {
-          factura: facturaCreada,
-          detalles,
-          parejas,
-          tipoMensaje: 0,
+
+    if (session.usuario) {
+      let facturaCreada = await this._facturaService.buscarUnaFactura(+id);
+      var parejas = await this._parejaService.buscarParejas();
+      var detalles = await this._detalleFacturaService.buscarDetallesFactura({ factura: +id });
+      res.render('factura/rutas/ruta-crear-factura-con-detalles',
+        {
+          datos: {
+            factura: facturaCreada,
+            detalles,
+            parejas,
+            tipoMensaje: 0,
+          }
         }
-      }
-    );
+      );
+    } else {
+      res.redirect('/login');
+    }
+
   }
 
   @Post(':id')

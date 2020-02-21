@@ -7,6 +7,7 @@ import { detalleFactura } from './detalleFactura';
 import { ParqueService } from '../Parque/parque.service';
 import { ParejaService } from '../Pareja/pareja.service';
 import { UsuarioEntity } from '../Usuario/usuario.entity';
+import e = require('express');
 
 @Controller('factura')
 export class FacturaController {
@@ -22,48 +23,101 @@ export class FacturaController {
     @Res() res,
     @Session() session
   ) {
-    console.log('hola')
-    var facturas = await this._facturaService.buscarFacturas(
-      {
-        usuario : session.usuario.userId,
-        estado  : 0
-      }
-    );
+    if (session.usuario) {
+      var facturas = await this._facturaService.buscarFacturas(
+        {
+          usuario: session.usuario.userId,
+          estado: 0
+        }
+      );
 
-    if(facturas.length > 0){
-      res.render('factura/rutas/ruta-crear-factura',
-      {
-        datos:{
-          tipoMensaje: 2,
-          mensaje: "No se puede seguir ingresando facturas mientras no haya sido finalizada la factura actual",
-        }
+      if (facturas.length > 0) {
+        res.render('factura/rutas/ruta-crear-factura',
+          {
+            datos: {
+              tipoMensaje: 2,
+              mensaje: "No se puede seguir ingresando facturas mientras no haya sido finalizada la factura actual",
+            }
+          }
+        );
+      } else {
+        res.render('factura/rutas/ruta-crear-factura',
+          {
+            datos: {
+              tipoMensaje: 0,
+            }
+          }
+        );
       }
-    );
-    }else{
-      res.render('factura/rutas/ruta-crear-factura',
-      {
-        datos:{
-          tipoMensaje: 0,          
-        }
-      }
-    );
+
+    } else {
+      res.redirect('/login');
     }
-    
+  }
+
+  @Post('ruta/ingresarFactura')
+  async rutaIngresarFactura(
+    @Body() factura:FacturaEntity,
+    @Res() res,
+    @Session() session
+  ): Promise<void>{
+    if (session.usuario) {
+      if (session.usuario.roles.includes('Usuario')) {
+        const facturaCreateDto = new FacturaCreateDto();
+        facturaCreateDto.fecha = factura.fecha;
+        facturaCreateDto.direccion = factura.direccion;
+        const errores = await validate(facturaCreateDto);
+        if (errores.length > 0) {
+          throw new BadRequestException(errores);
+        } else {
+          try {
+            factura.total = 0;
+            factura.estado = false;
+            let usuario = new UsuarioEntity();
+            usuario.id = session.usuario.userId;
+            factura.usuario = usuario;
+            var facturaCreada = await this._facturaService.crearFactura(factura);
+            var parejas = await this._parejaService.buscarParejas();
+            res.render('factura/rutas/ruta-crear-factura-con-detalles',
+              {
+                datos: {
+                  factura: facturaCreada,
+                  detalles: [],
+                  parejas,
+                  tipoMensaje: 0
+                }
+              }
+            );
+          } catch (e) {
+            throw new BadRequestException(e);
+          }
+        }
+      } else {
+        res.send("No cuenta con permisos de Usuario");
+      }
+    }else{
+      res.redirect('/login');
+    }
   }
 
   @Get('ruta/mostrar-facturas')
   async rutaMostrarFacturas(
     @Res() res,
     @Session() session
-  ){
-    const facturas = await this._facturaService.buscarFacturas({usuario: session.usuario.userId})
-    res.render('factura/rutas/ruta-mostrar-facturas',
-    {
-      datos: {
-        facturas
-      }
+  ) {
+    if (session.usuario) {
+      const facturas = await this._facturaService.buscarFacturas({ usuario: session.usuario.userId })
+      res.render('factura/rutas/ruta-mostrar-facturas',
+        {
+          datos: {
+            facturas
+          }
+        }
+      );
+    } else {
+      res.redirect('/login');
     }
-  );
+
   }
 
 
@@ -88,12 +142,12 @@ export class FacturaController {
             let usuario = new UsuarioEntity();
             usuario.id = session.usuario.userId;
             factura.usuario = usuario;
-            var facturaCreada = await this._facturaService.crearFactura(factura);            
+            var facturaCreada = await this._facturaService.crearFactura(factura);
             var parejas = await this._parejaService.buscarParejas();
             res.render('factura/rutas/ruta-crear-factura-con-detalles',
               {
-                datos : {
-                  factura : facturaCreada,
+                datos: {
+                  factura: facturaCreada,
                   detalles: [],
                   parejas,
                   tipoMensaje: 0
@@ -112,27 +166,27 @@ export class FacturaController {
 
   @Post('actualizarTotal/:id')
   async actualizarTotalFactura(
-    @Param('id') id:string,
-    @Query('total') total:string,
+    @Param('id') id: string,
+    @Query('total') total: string,
     @Res() res
-  ):Promise<void>{
-     await this._facturaService.editarTotal(+id, +total);
-     res.send('ok');
+  ): Promise<void> {
+    await this._facturaService.editarTotal(+id, +total);
+    res.send('ok');
   }
 
   @Post('finalizar/:id')
   async finalizarFactura(
-    @Param('id') id:string,
+    @Param('id') id: string,
     @Res() res
-  ):Promise<void>{
-     await this._facturaService.finalizarFactura(+id);
-     res.redirect('/factura/ruta/crear-factura');
+  ): Promise<void> {
+    await this._facturaService.finalizarFactura(+id);
+    res.redirect('/factura/ruta/crear-factura');
   }
 
   @Get(':id')
   buscarUnaFactura(
-    @Param('id') id: string,
-  ): Promise<FacturaEntity | undefined> {
+    @Param('id') id: string
+  ): Promise<FacturaEntity | undefined | void> {
     return this._facturaService.buscarUnaFactura(Number(id));
   }
 
@@ -141,28 +195,29 @@ export class FacturaController {
     @Query('skip') skip?: string | number,
     @Query('take') take?: string | number,
     @Query('where') where?: string,
-    @Query('order') order?: string
-  ): Promise<FacturaEntity[] | undefined> {
-    if (order) {
-      try {
-        order = JSON.parse(order);
-      } catch (e) {
-        order = undefined;
-      }
-    }
+    @Query('order') order?: string,
+  ): Promise<FacturaEntity[] | undefined | void> {
 
-    if (where) {
-      try {
-        where = JSON.parse(where);
-      } catch (e) {
-        where = undefined;
+      if (order) {
+        try {
+          order = JSON.parse(order);
+        } catch (e) {
+          order = undefined;
+        }
       }
-    }
-    return this._facturaService.buscarFacturas(
-      where,
-      skip as number,
-      take as number,
-      order
-    );
+  
+      if (where) {
+        try {
+          where = JSON.parse(where);
+        } catch (e) {
+          where = undefined;
+        }
+      }
+      return this._facturaService.buscarFacturas(
+        where,
+        skip as number,
+        take as number,
+        order
+      );  
   }
 }

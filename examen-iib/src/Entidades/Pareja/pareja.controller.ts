@@ -21,70 +21,88 @@ export class ParejaController {
     @Query('error') error: string,
     @Query('consultarPareja') consultarPareja: string,
     @Res() res,
+    @Session() session
   ) {
-    let consultaServicio;
-    if (consultarPareja) {
-      consultaServicio = [
+    if (session.usuario) {
+      let consultaServicio;
+      if (consultarPareja) {
+        consultaServicio = [
+          {
+            nombre: Like('%' + consultarPareja + '%')
+          },
+          {
+            anios: Like('%' + consultarPareja + '%')
+          },
+        ];
+      }
+
+      const parejas = await this._parejaService.buscarParejas(consultaServicio)
+      console.log(parejas);
+      res.render('pareja/rutas/ruta_mostrar_pareja',
         {
-          nombre: Like('%' + consultarPareja + '%')
-        },
-        {
-          anios: Like('%' + consultarPareja + '%')
-        },
-      ];
+          datos: {
+            parejas,
+            mensaje,
+            error
+          }
+        }
+      );
+    } else {
+      res.redirect('/login');
     }
 
-    const parejas = await this._parejaService.buscarParejas(consultaServicio)
-    console.log(parejas);
-    res.render('pareja/rutas/ruta_mostrar_pareja',
-      {
-        datos: {
-          parejas,
-          mensaje,
-          error
-        }
-      }
-    );
   }
 
   @Get('ruta/crear-pareja')
   async rutaCrearPareja(
     @Res() res,
+    @Session() session
   ) {
-    const parques = await this._parqueService.buscarParques();
-    res.render('pareja/rutas/ruta_crear_pareja',
-      {
-        datos: {
-          parques,
-          tipoMensaje: 0,
+    if (session.usuario) {
+      const parques = await this._parqueService.buscarParques();
+      res.render('pareja/rutas/ruta_crear_pareja',
+        {
+          datos: {
+            parques,
+            tipoMensaje: 0,
+          }
         }
-      }
-    );
+      );
+    } else {
+      res.redirect('/login');
+    }
+
   }
 
   @Get('ruta/editar-pareja/:idPareja')
   async rutaEditarPareja(
     @Param('idPareja') idPareja: string,
     @Res() res,
+    @Session() session
   ) {
-    const pareja = await this._parejaService.buscarUnaPareja(+idPareja);
-    const parques = await this._parqueService.buscarParques();
-    try {
-      if (pareja) {
-        res.render('pareja/rutas/ruta_crear_pareja',
-          {
-            datos: {
-              tipoMensaje: 0,
-              pareja,
-              parques
+    if (session.usuario) {
+      const pareja = await this._parejaService.buscarUnaPareja(+idPareja);
+      const parques = await this._parqueService.buscarParques();
+      try {
+        if (pareja) {
+          res.render('pareja/rutas/ruta_crear_pareja',
+            {
+              datos: {
+                tipoMensaje: 0,
+                pareja,
+                parques
+              }
             }
-          }
-        );
+          );
+
+        }
+      } catch (e) {
 
       }
-    } catch (e) {
-
+    } else {
+      res.redirect('/login');
     }
+
   }
 
   @Post()
@@ -217,7 +235,7 @@ export class ParejaController {
             }
           );
         } else {
-          try{
+          try {
             const parejaEditar = await this._parejaService.actualizarParejas(+id, pareja);
             res.render('pareja/rutas/ruta_crear_pareja',
               {
@@ -229,19 +247,19 @@ export class ParejaController {
                 }
               }
             );
-          }catch(e){
+          } catch (e) {
             res.render('pareja/rutas/ruta_crear_pareja',
-            {
-              datos: {
-                pareja,
-                parques,
-                tipoMensaje: 2,
-                mensaje: "No se pudo modificar la pareja"
+              {
+                datos: {
+                  pareja,
+                  parques,
+                  tipoMensaje: 2,
+                  mensaje: "No se pudo modificar la pareja"
+                }
               }
-            }
-          );
+            );
           }
-          
+
         }
       } else {
         res.render('pareja/rutas/ruta_crear_pareja',

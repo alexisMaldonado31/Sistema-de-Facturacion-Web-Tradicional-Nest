@@ -28,19 +28,10 @@ export class UsuarioController {
                 roles: [usuarioValidado.rol]
             }
             if (usuarioValidado.rol === "Administrador") {
-                res.render('parque/rutas/ruta-crear-parque',
-                    {
-                        datos: {
-                            tipoMensaje: 0,
-                        }
-                    }
+                res.redirect("/parque/ruta/crear-parque",
                 );
             } else {
-                res.render('factura/rutas/ruta-crear-factura',{
-                    datos: {
-                        tipoMensaje: 0,
-                    }
-                }
+                res.redirect("/factura/ruta/crear-factura",
                 );
             }
 

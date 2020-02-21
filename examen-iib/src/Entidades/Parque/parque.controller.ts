@@ -19,44 +19,57 @@ export class ParqueController {
     @Query('error') error: string,
     @Query('consultarParque') consultarParque: string,
     @Res() res,
+    @Session() session
   ) {
-    let consultaServicio;
-    if (consultarParque) {
-      consultaServicio = [
-        {
-          nombre: Like('%' + consultarParque + '%')
-        },
-        {
-          ciudad: Like('%' + consultarParque + '%')
-        },
-        {
-          codigoPostal: Like('%' + consultarParque + '%')
-        }
-      ];
-    }
-    const parques = await this._parqueService.buscarParques(consultaServicio);
-    res.render('parque/rutas/ruta-mostrar-parque',
-      {
-        datos: {
-          parques,
-          mensaje,
-          error
-        }
+    if (session.usuario) {
+      let consultaServicio;
+      if (consultarParque) {
+        consultaServicio = [
+          {
+            nombre: Like('%' + consultarParque + '%')
+          },
+          {
+            ciudad: Like('%' + consultarParque + '%')
+          },
+          {
+            codigoPostal: Like('%' + consultarParque + '%')
+          }
+        ];
       }
-    );
+      const parques = await this._parqueService.buscarParques(consultaServicio);
+      res.render('parque/rutas/ruta-mostrar-parque',
+        {
+          datos: {
+            parques,
+            mensaje,
+            error
+          }
+        }
+      );
+    } else {
+      res.redirect('/login');
+    }
+
   }
 
   @Get('ruta/crear-parque')
   rutaCrearParque(
     @Res() res,
+    @Session() session
   ) {
-    res.render('parque/rutas/ruta-crear-parque',
-      {
-        datos: {
-          tipoMensaje: 0,
+    console.log(session);
+    if (session.usuario) {
+      res.render('parque/rutas/ruta-crear-parque',
+        {
+          datos: {
+            tipoMensaje: 0,
+          }
         }
-      }
-    );
+      );
+    } else {
+      res.redirect('/login');
+    }
+
   }
 
   @Post()
@@ -104,6 +117,8 @@ export class ParqueController {
           }
         });
       }
+    } else {
+      res.render('login/login')
     }
   }
 
@@ -111,36 +126,41 @@ export class ParqueController {
   async rutaEditarParque(
     @Param('idUsuario') idUsuario: string,
     @Res() res,
+    @Session() session
   ) {
-    const parque = await this._parqueService.buscarUnParque(+idUsuario);
-    try {
-      if (parque) {
-        res.render('parque/rutas/ruta-crear-parque',
-          {
-            datos: {
-              tipoMensaje : 0,
-              parque 
+    if (session.usuario) {
+      const parque = await this._parqueService.buscarUnParque(+idUsuario);
+      try {
+        if (parque) {
+          res.render('parque/rutas/ruta-crear-parque',
+            {
+              datos: {
+                tipoMensaje: 0,
+                parque
+              }
             }
-          }
-        );
-      } else {
+          );
+        } else {
+          res.render('parque/rutas/ruta-crear-parque', {
+            datos: {
+              tipoMensaje: 2,
+              mensaje: "El parque no se pudo modificar",
+              parque
+            }
+          });
+        }
+
+      } catch (e) {
         res.render('parque/rutas/ruta-crear-parque', {
           datos: {
             tipoMensaje: 2,
-            mensaje: "El parque no se pudo modificar",
+            mensaje: "No tiene permisos de Administrador",
             parque
           }
         });
       }
-
-    } catch (e) {
-      res.render('parque/rutas/ruta-crear-parque', {
-        datos: {
-          tipoMensaje: 2,
-          mensaje: "No tiene permisos de Administrador",
-          parque
-        }
-      });
+    } else {
+      res.redirect('/login');
     }
   }
 
@@ -248,32 +268,32 @@ export class ParqueController {
         const errores = await validate(parqueUpdateDto);
         if (errores.length > 0) {
           res.render('parque/rutas/ruta-crear-parque',
-          {
-            datos: {
-              tipoMensaje : 2,
-              mensaje: "No se pudo actualizar el parque. Datos erroneos",
-              parque 
-            }
-          });
+            {
+              datos: {
+                tipoMensaje: 2,
+                mensaje: "No se pudo actualizar el parque. Datos erroneos",
+                parque
+              }
+            });
         } else {
           const parqueActualizado = await this._parqueService.actualizarParque(+id, parque);
           res.render('parque/rutas/ruta-crear-parque',
-          {
-            datos: {
-              tipoMensaje : 1,
-              mensaje: "El Parque ha sido actualizado con exito",
-              parque: parqueActualizado 
+            {
+              datos: {
+                tipoMensaje: 1,
+                mensaje: "El Parque ha sido actualizado con exito",
+                parque: parqueActualizado
+              }
             }
-          }
-        );
+          );
         }
       } else {
         res.render('parque/rutas/ruta-crear-parque',
           {
             datos: {
-              tipoMensaje : 2,
+              tipoMensaje: 2,
               mensaje: "No cuenta con permisos de administrador",
-              parque 
+              parque
             }
           });
       }
